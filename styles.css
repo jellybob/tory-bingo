@@ -1,0 +1,126 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 10px;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+}
+
+.bingo-card {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.bingo-square {
+  aspect-ratio: 1 / 1;
+  background-color: #e0e0e0;
+  border: 2px solid #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 5px;
+  overflow: hidden;
+}
+
+.bingo-square.checked {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.candidate-name {
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 1.2;
+  max-height: 2.4em;
+  /* Allows for 2 lines of text */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+}
+
+.constituency {
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.free-square {
+  background-color: #FFC107;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.reset-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.loading {
+  font-size: 18px;
+  text-align: center;
+  margin: 20px;
+}
+
+.error {
+  color: red;
+  font-size: 18px;
+  text-align: center;
+  margin: 20px;
+}
+
+@media (max-width: 768px) {
+  .bingo-card {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .candidate-name {
+    font-size: 10px;
+  }
+
+  .constituency {
+    font-size: 8px;
+  }
+
+  .free-square {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .candidate-name {
+    font-size: 8px;
+  }
+
+  .constituency {
+    font-size: 6px;
+  }
+
+  .free-square {
+    font-size: 12px;
+  }
+}

@@ -8,132 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 10px;
-      background-color: #f0f0f0;
-      box-sizing: border-box;
-    }
-    
-    .bingo-card {
-      aspect-ratio: 1 / 1;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      max-height: 100%;
-      box-sizing: border-box;
-    }
-    
-    .bingo-square {
-      aspect-ratio: 1 / 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 12px;
-      background-color: #e0e0e0;
-      border: 2px solid #333;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      padding: 5px;
-      box-sizing: border-box;
-    }
-    
-    .bingo-square.checked {
-      background-color: #4CAF50;
-      color: white;
-    }
-    
-    .candidate-name {
-      font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 1.8vw;
-    }
-    
-    .constituency {
-      font-size: 1.4vw;
-    }
-    
-    .free-square {
-      background-color: #FFC107;
-      font-size: 2.5vw;
-      font-weight: bold;
-    }
-    
-    .reset-button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #f44336;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    
-    .loading {
-      font-size: 18px;
-      text-align: center;
-      margin: 20px;
-    }
-    
-    .error {
-      color: red;
-      font-size: 18px;
-      text-align: center;
-      margin: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .bingo-card {
-        gap: 5px;
-        padding: 5px;
-      }
-    
-      .bingo-square {
-        padding: 2px;
-      }
-    
-      .candidate-name {
-        font-size: 2.5vw;
-      }
-    
-      .constituency {
-        font-size: 2vw;
-      }
-    
-      .free-square {
-        font-size: 3.5vw;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .candidate-name {
-        font-size: 3vw;
-      }
-    
-      .constituency {
-        font-size: 2vw;
-      }
-    
-      .free-square {
-        font-size: 4vw;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
@@ -1142,6 +1017,11 @@
         window.location.reload();
       };
 
+      const elideText = (text, maxLength) => {
+        if (text.length <= maxLength) return text;
+        return text.slice(0, maxLength - 3) + '...';
+      };
+      
       const renderSquare = (index) => {
         if (index === 12) {
           return (
@@ -1154,19 +1034,21 @@
         const itemIndex = index > 12 ? index - 1 : index;
         const isChecked = checkedSquares.has(index);
 
-        // Add a safeguard check
         if (!items[itemIndex]) {
           return <div key={index} className="bingo-square">Loading...</div>;
         }
 
+        const { candidate, constituency } = items[itemIndex];
+        
         return (
           <div
             key={index}
             className={`bingo-square ${isChecked ? 'checked' : ''}`}
             onClick={() => toggleSquare(index)}
+            title={`${candidate} - ${constituency}`}
           >
-            <div className="candidate-name">{items[itemIndex].candidate}</div>
-            <div className="constituency">{items[itemIndex].constituency}</div>
+            <div className="candidate-name">{candidate}</div>
+            {candidate.length <= 20 && <div className="constituency">{constituency}</div>}
           </div>
         );
       };
