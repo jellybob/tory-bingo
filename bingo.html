@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Candidate and Constituency Bingo Card Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .bingo-card {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .bingo-square {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 12px;
+      background-color: #e0e0e0;
+      border: 2px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      padding: 5px;
+    }
+
+    .bingo-square.checked {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .candidate-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .constituency {
+      font-size: 10px;
+    }
+
+    .free-square {
+      background-color: #FFC107;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .reset-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .loading {
+      font-size: 18px;
+      text-align: center;
+      margin: 20px;
+    }
+
+    .error {
+      color: red;
+      font-size: 18px;
+      text-align: center;
+      margin: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const BingoCard = () => {
+      const [items, setItems] = React.useState([]);
+      const [checkedSquares, setCheckedSquares] = React.useState(new Set());
+      const [isLoading, setIsLoading] = React.useState(true);
+      const [error, setError] = React.useState(null);
+
+      React.useEffect(() => {
+        try {
+          const savedState = localStorage.getItem('bingoState');
+          if (savedState) {
+            const { savedItems, savedCheckedSquares } = JSON.parse(savedState);
+            setItems(savedItems);
+            setCheckedSquares(new Set(savedCheckedSquares));
+          } else {
+            // Extended JSON array of items using the schema
+            const jsonItems = [
+              {
+                "constituency": "Braintree",
+                "candidate": "James Cleverly"
+              },
+              {
+                "constituency": "Brentwood and Ongar",
+                "candidate": "Alex Burghart"
+              },
+              {
+                "constituency": "Broadland and Fakenham",
+                "candidate": "Jerome Mayhew"
+              },
+              {
+                "constituency": "Castle Point",
+                "candidate": "Rebecca Harris"
+              },
+              {
+                "constituency": "Chelmsford",
+                "candidate": "Vicky Ford"
+              },
+              {
+                "constituency": "Clacton",
+                "candidate": "Giles Watling"
+              },
+              {
+                "constituency": "Dunstable and Leighton Buzzard",
+                "candidate": "Andrew Selous"
+              },
+              {
+                "constituency": "Ely and East Cambridgeshire",
+                "candidate": "Lucy Frazer"
+              },
+              {
+                "constituency": "South West Hertfordshire",
+                "candidate": "Gagan Mohindra"
+              },
+              {
+                "constituency": "Hitchin",
+                "candidate": "Bim Afolami"
+              },
+              {
+                "constituency": "Harwich and North Essex",
+                "candidate": "Bernard Jenkin"
+              },
+              {
+                "constituency": "Hertford and Stortford",
+                "candidate": "Julie Marson"
+              },
+              {
+                "constituency": "Hertsmere",
+                "candidate": "Oliver Dowden"
+              },
+              {
+                "constituency": "Ipswich",
+                "candidate": "Tom Hunt"
+              },
+              {
+                "constituency": "Lowestoft",
+                "candidate": "Peter Aldous"
+              },
+              {
+                "constituency": "Maldon",
+                "candidate": "John Whittingdale"
+              },
+              {
+                "constituency": "Mid Norfolk",
+                "candidate": "George Freeman"
+              },
+              {
+                "constituency": "North Bedfordshire",
+                "candidate": "Richard Fuller"
+              },
+              {
+                "constituency": "North East Cambridgeshire",
+                "candidate": "Steve Barclay"
+              },
+              {
+                "constituency": "North Norfolk",
+                "candidate": "Duncan Baker"
+              },
+              {
+                "constituency": "North West Cambridgeshire",
+                "candidate": "Shailesh Vara"
+              },
+              {
+                "constituency": "North West Norfolk",
+                "candidate": "James Wild"
+              },
+              {
+                "constituency": "Peterborough",
+                "candidate": "Paul Bristow"
+              },
+              {
+                "constituency": "Rayleigh and Wickford",
+                "candidate": "Mark Francois"
+              },
+              {
+                "constituency": "North West Essex",
+                "candidate": "Kemi Badenoch"
+              },
+              {
+                "constituency": "South Basildon and East Thurrock",
+                "candidate": "Stephen Metcalfe"
+              },
+              {
+                "constituency": "South Suffolk",
+                "candidate": "James Cartlidge"
+              },
+              {
+                "constituency": "South West Norfolk",
+                "candidate": "Liz Truss"
+              },
+              {
+                "constituency": "Southend West and Leigh",
+                "candidate": "Anna Firth"
+              },
+              {
+                "constituency": "Suffolk Coastal",
+                "candidate": "Th\u00e9r\u00e8se Coffey"
+              },
+              {
+                "constituency": "Thurrock",
+                "candidate": "Jackie Doyle-Price"
+              },
+              {
+                "constituency": "Watford",
+                "candidate": "Dean Russell"
+              },
+              {
+                "constituency": "Welwyn Hatfield",
+                "candidate": "Grant Shapps"
+              },
+              {
+                "constituency": "Witham",
+                "candidate": "Priti Patel"
+              },
+              {
+                "constituency": "Amber Valley",
+                "candidate": "Nigel Mills"
+              },
+              {
+                "constituency": "Bassetlaw",
+                "candidate": "Brendan Clarke-Smith"
+              },
+              {
+                "constituency": "Bolsover",
+                "candidate": "Mark Fletcher"
+              },
+              {
+                "constituency": "Boston and Skegness",
+                "candidate": "Matt Warman"
+              },
+              {
+                "constituency": "Hinckley and Bosworth",
+                "candidate": "Luke Evans"
+              },
+              {
+                "constituency": "Broxtowe",
+                "candidate": "Darren Henry"
+              },
+              {
+                "constituency": "Corby and East Northamptonshire",
+                "candidate": "Tom Pursglove"
+              },
+              {
+                "constituency": "Derby North",
+                "candidate": "Amanda Solloway"
+              },
+              {
+                "constituency": "Derbyshire Dales",
+                "candidate": "Sarah Dines"
+              },
+              {
+                "constituency": "Erewash",
+                "candidate": "Maggie Throup"
+              },
+              {
+                "constituency": "Gainsborough",
+                "candidate": "Edward Leigh"
+              },
+              {
+                "constituency": "Gedling",
+                "candidate": "Tom Randall"
+              },
+              {
+                "constituency": "Harborough, Oadby and Wigston",
+                "candidate": "Neil O'Brien"
+              },
+              {
+                "constituency": "High Peak",
+                "candidate": "Robert Largan"
+              },
+              {
+                "constituency": "Kettering",
+                "candidate": "Philip Hollobone"
+              },
+              {
+                "constituency": "Lincoln",
+                "candidate": "Karl McCartney"
+              },
+              {
+                "constituency": "Loughborough",
+                "candidate": "Jane Hunt"
+              },
+              {
+                "constituency": "Louth and Horncastle",
+                "candidate": "Victoria Atkins"
+              },
+              {
+                "constituency": "Mansfield",
+                "candidate": "Ben Bradley"
+              },
+              {
+                "constituency": "Newark",
+                "candidate": "Robert Jenrick"
+              },
+              {
+                "constituency": "North East Derbyshire",
+                "candidate": "Lee Rowley"
+              },
+              {
+                "constituency": "Northampton South",
+                "candidate": "Andrew Lewer"
+              },
+              {
+                "constituency": "Rushcliffe",
+                "candidate": "Ruth Edwards"
+              },
+              {
+                "constituency": "Rutland and Stamford",
+                "candidate": "Alicia Kearns"
+              },
+              {
+                "constituency": "Grantham and Bourne",
+                "candidate": "Gareth Davies"
+              },
+              {
+                "constituency": "Sherwood Forest",
+                "candidate": "Mark Spencer"
+              },
+              {
+                "constituency": "South Derbyshire",
+                "candidate": "Heather Wheeler"
+              },
+              {
+                "constituency": "South Holland and The Deepings",
+                "candidate": "John Hayes"
+              },
+              {
+                "constituency": "South Leicestershire",
+                "candidate": "Alberto Costa"
+              },
+              {
+                "constituency": "Carshalton and Wallington",
+                "candidate": "Elliot Colburn"
+              },
+              {
+                "constituency": "Chelsea and Fulham",
+                "candidate": "Greg Hands"
+              },
+              {
+                "constituency": "Chingford and Woodford Green",
+                "candidate": "Iain Duncan Smith"
+              },
+              {
+                "constituency": "Chipping Barnet",
+                "candidate": "Theresa Villiers"
+              },
+              {
+                "constituency": "Croydon South",
+                "candidate": "Chris Philp"
+              },
+              {
+                "constituency": "Harrow East",
+                "candidate": "Bob Blackman"
+              },
+              {
+                "constituency": "Hornchurch and Upminster",
+                "candidate": "Julia Lopez"
+              },
+              {
+                "constituency": "Kensington and Bayswater",
+                "candidate": "Felicity Buchan"
+              },
+              {
+                "constituency": "Old Bexley and Sidcup",
+                "candidate": "Louie French"
+              },
+              {
+                "constituency": "Uxbridge and South Ruislip",
+                "candidate": "Steve Tuckwell"
+              },
+              {
+                "constituency": "Cramlington and Killingworth",
+                "candidate": "Ian Levy"
+              },
+              {
+                "constituency": "Darlington",
+                "candidate": "Peter Gibson"
+              },
+              {
+                "constituency": "Hartlepool",
+                "candidate": "Jill Mortimer"
+              },
+              {
+                "constituency": "Hexham",
+                "candidate": "Guy Opperman"
+              },
+              {
+                "constituency": "Middlesbrough South and East Cleveland",
+                "candidate": "Simon Clarke"
+              },
+              {
+                "constituency": "Newton Aycliffe and Spennymoor",
+                "candidate": "Paul Howell"
+              },
+              {
+                "constituency": "North Northumberland",
+                "candidate": "Anne-Marie Trevelyan"
+              },
+              {
+                "constituency": "Redcar",
+                "candidate": "Jacob Young"
+              },
+              {
+                "constituency": "Stockton West",
+                "candidate": "Matt Vickers"
+              },
+              {
+                "constituency": "Barrow and Furness",
+                "candidate": "Simon Fell"
+              },
+              {
+                "constituency": "Blackpool North and Fleetwood",
+                "candidate": "Paul Maynard"
+              },
+              {
+                "constituency": "Bolton West",
+                "candidate": "Chris Green"
+              },
+              {
+                "constituency": "Burnley",
+                "candidate": "Antony Higginbotham"
+              },
+              {
+                "constituency": "Bury North",
+                "candidate": "James Daly"
+              },
+              {
+                "constituency": "Carlisle",
+                "candidate": "John Stevenson"
+              },
+              {
+                "constituency": "Hyndburn",
+                "candidate": "Sara Britcliffe"
+              },
+              {
+                "constituency": "Macclesfield",
+                "candidate": "David Rutley"
+              },
+              {
+                "constituency": "Morecambe and Lunesdale",
+                "candidate": "David Morris"
+              },
+              {
+                "constituency": "Pendle and Clitheroe",
+                "candidate": "Andrew Stephenson"
+              },
+              {
+                "constituency": "Penrith and Solway",
+                "candidate": "Mark Jenkinson"
+              },
+              {
+                "constituency": "Ribble Valley",
+                "candidate": "Nigel Evans"
+              },
+              {
+                "constituency": "Rossendale and Darwen",
+                "candidate": "Jake Berry"
+              },
+              {
+                "constituency": "South Ribble",
+                "candidate": "Katherine Fletcher"
+              },
+              {
+                "constituency": "Southport",
+                "candidate": "Damien Moore"
+              },
+              {
+                "constituency": "Tatton",
+                "candidate": "Esther McVey"
+              },
+              {
+                "constituency": "Warrington South",
+                "candidate": "Andy Carter"
+              },
+              {
+                "constituency": "Berwickshire, Roxburgh and Selkirk",
+                "candidate": "John Lamont"
+              },
+              {
+                "constituency": "Dumfriesshire, Clydesdale and Tweeddale",
+                "candidate": "David Mundell"
+              },
+              {
+                "constituency": "West Aberdeenshire and Kincardine",
+                "candidate": "Andrew Bowie"
+              },
+              {
+                "constituency": "Aldershot",
+                "candidate": "Leo Docherty"
+              },
+              {
+                "constituency": "Arundel and South Downs",
+                "candidate": "Andrew Griffith"
+              },
+              {
+                "constituency": "Ashford",
+                "candidate": "Damian Green"
+              },
+              {
+                "constituency": "Aylesbury",
+                "candidate": "Rob Butler"
+              },
+              {
+                "constituency": "Banbury",
+                "candidate": "Victoria Prentis"
+              },
+              {
+                "constituency": "Basingstoke",
+                "candidate": "Maria Miller"
+              },
+              {
+                "constituency": "Beaconsfield",
+                "candidate": "Joy Morrissey"
+              },
+              {
+                "constituency": "Bracknell",
+                "candidate": "James Sunderland"
+              },
+              {
+                "constituency": "Chichester",
+                "candidate": "Gillian Keegan"
+              },
+              {
+                "constituency": "Dartford",
+                "candidate": "Gareth Johnson"
+              },
+              {
+                "constituency": "Didcot and Wantage",
+                "candidate": "David Johnston"
+              },
+              {
+                "constituency": "East Hampshire",
+                "candidate": "Damian Hinds"
+              },
+              {
+                "constituency": "East Surrey",
+                "candidate": "Claire Coutinho"
+              },
+              {
+                "constituency": "Eastbourne",
+                "candidate": "Caroline Ansell"
+              },
+              {
+                "constituency": "Faversham and Mid Kent",
+                "candidate": "Helen Whately"
+              },
+              {
+                "constituency": "Folkestone and Hythe",
+                "candidate": "Damian Collins"
+              },
+              {
+                "constituency": "Gillingham and Rainham",
+                "candidate": "Rehman Chishti"
+              },
+              {
+                "constituency": "Gosport",
+                "candidate": "Caroline Dinenage"
+              },
+              {
+                "constituency": "Gravesham",
+                "candidate": "Adam Holloway"
+              },
+              {
+                "constituency": "Guildford",
+                "candidate": "Angela Richardson"
+              },
+              {
+                "constituency": "Hastings and Rye",
+                "candidate": "Sally-Ann Hart"
+              },
+              {
+                "constituency": "Havant",
+                "candidate": "Alan Mak"
+              },
+              {
+                "constituency": "Herne Bay and Sandwich",
+                "candidate": "Roger Gale"
+              },
+              {
+                "constituency": "Horsham",
+                "candidate": "Jeremy Quin"
+              },
+              {
+                "constituency": "Lewes",
+                "candidate": "Maria Caulfield"
+              },
+              {
+                "constituency": "Maidstone and Malling",
+                "candidate": "Helen Grant"
+              },
+              {
+                "constituency": "Milton Keynes North",
+                "candidate": "Ben Everitt"
+              },
+              {
+                "constituency": "New Forest East",
+                "candidate": "Julian Lewis"
+              },
+              {
+                "constituency": "New Forest West",
+                "candidate": "Desmond Swayne"
+              },
+              {
+                "constituency": "Newbury",
+                "candidate": "Laura Farris"
+              },
+              {
+                "constituency": "North East Hampshire",
+                "candidate": "Ranil Jayawardena"
+              },
+              {
+                "constituency": "North West Hampshire",
+                "candidate": "Kit Malthouse"
+              },
+              {
+                "constituency": "Portsmouth North",
+                "candidate": "Penny Mordaunt"
+              },
+              {
+                "constituency": "Rochester and Strood",
+                "candidate": "Kelly Tolhurst"
+              },
+              {
+                "constituency": "Romsey and Southampton North",
+                "candidate": "Caroline Nokes"
+              },
+              {
+                "constituency": "Runnymede and Weybridge",
+                "candidate": "Ben Spencer"
+              },
+              {
+                "constituency": "Sevenoaks",
+                "candidate": "Laura Trott"
+              },
+              {
+                "constituency": "Sussex Weald",
+                "candidate": "Nus Ghani"
+              },
+              {
+                "constituency": "Tonbridge",
+                "candidate": "Tom Tugendhat"
+              },
+              {
+                "constituency": "Witney",
+                "candidate": "Robert Courts"
+              },
+              {
+                "constituency": "Woking",
+                "candidate": "Jonathan Lord"
+              },
+              {
+                "constituency": "Worthing West",
+                "candidate": "Peter Bottomley"
+              },
+              {
+                "constituency": "Wycombe",
+                "candidate": "Steve Baker"
+              },
+              {
+                "constituency": "Bournemouth East",
+                "candidate": "Tobias Ellwood"
+              },
+              {
+                "constituency": "Bournemouth West",
+                "candidate": "Conor Burns"
+              },
+              {
+                "constituency": "Central Devon",
+                "candidate": "Mel Stride"
+              },
+              {
+                "constituency": "Cheltenham",
+                "candidate": "Alex Chalk"
+              },
+              {
+                "constituency": "Christchurch",
+                "candidate": "Christopher Chope"
+              },
+              {
+                "constituency": "East Wiltshire",
+                "candidate": "Danny Kruger"
+              },
+              {
+                "constituency": "Filton and Bradley Stoke",
+                "candidate": "Jack Lopresti"
+              },
+              {
+                "constituency": "Forest of Dean",
+                "candidate": "Mark Harper"
+              },
+              {
+                "constituency": "Gloucester",
+                "candidate": "Richard Graham"
+              },
+              {
+                "constituency": "Mid Dorset and North Poole",
+                "candidate": "Michael Tomlinson"
+              },
+              {
+                "constituency": "Newton Abbot",
+                "candidate": "Anne Marie Morris"
+              },
+              {
+                "constituency": "North Cornwall",
+                "candidate": "Scott Mann"
+              },
+              {
+                "constituency": "North Cotswolds",
+                "candidate": "Geoffrey Clifton-Brown"
+              },
+              {
+                "constituency": "North Devon",
+                "candidate": "Selaine Saxby"
+              },
+              {
+                "constituency": "North Dorset",
+                "candidate": "Simon Hoare"
+              },
+              {
+                "constituency": "North East Somerset and Hanham",
+                "candidate": "Jacob Rees-Mogg"
+              },
+              {
+                "constituency": "North Somerset",
+                "candidate": "Liam Fox"
+              },
+              {
+                "constituency": "Plymouth Moor View",
+                "candidate": "Johnny Mercer"
+              },
+              {
+                "constituency": "Poole",
+                "candidate": "Robert Syms"
+              },
+              {
+                "constituency": "Salisbury",
+                "candidate": "John Glen"
+              },
+              {
+                "constituency": "South Cotswolds",
+                "candidate": "James Gray"
+              },
+              {
+                "constituency": "South Devon",
+                "candidate": "Anthony Mangnall"
+              },
+              {
+                "constituency": "South Dorset",
+                "candidate": "Richard Drax"
+              },
+              {
+                "constituency": "South East Cornwall",
+                "candidate": "Sheryll Murray"
+              },
+              {
+                "constituency": "South West Wiltshire",
+                "candidate": "Andrew Murrison"
+              },
+              {
+                "constituency": "St Austell and Newquay",
+                "candidate": "Steve Double"
+              },
+              {
+                "constituency": "St Ives",
+                "candidate": "Derek Thomas"
+              },
+              {
+                "constituency": "Stroud",
+                "candidate": "Siobhan Baillie"
+              },
+              {
+                "constituency": "Swindon North",
+                "candidate": "Justin Tomlinson"
+              },
+              {
+                "constituency": "Swindon South",
+                "candidate": "Robert Buckland"
+              },
+              {
+                "constituency": "Taunton and Wellington",
+                "candidate": "Rebecca Pow"
+              },
+              {
+                "constituency": "Tewkesbury",
+                "candidate": "Laurence Robertson"
+              },
+              {
+                "constituency": "Thornbury and Yate",
+                "candidate": "Luke Hall"
+              },
+              {
+                "constituency": "Torbay",
+                "candidate": "Kevin Foster"
+              },
+              {
+                "constituency": "Torridge and Tavistock",
+                "candidate": "Geoffrey Cox"
+              },
+              {
+                "constituency": "Truro and Falmouth",
+                "candidate": "Cherilyn Mackrory"
+              },
+              {
+                "constituency": "West Dorset",
+                "candidate": "Chris Loder"
+              },
+              {
+                "constituency": "Weston-Super-Mare",
+                "candidate": "John Penrose"
+              },
+              {
+                "constituency": "Yeovil",
+                "candidate": "Marcus Fysh"
+              },
+              {
+                "constituency": "Bangor Aberconwy",
+                "candidate": "Robin Millar"
+              },
+              {
+                "constituency": "Brecon, Radnor and Cwm Tawe",
+                "candidate": "Fay Jones"
+              },
+              {
+                "constituency": "Monmouthshire",
+                "candidate": "David TC Davies"
+              },
+              {
+                "constituency": "Vale of Glamorgan",
+                "candidate": "Alun Cairns"
+              },
+              {
+                "constituency": "Wrexham",
+                "candidate": "Sarah Atherton"
+              },
+              {
+                "constituency": "Ynys M\u00f4n",
+                "candidate": "Virginia Crosbie"
+              },
+              {
+                "constituency": "Aldridge-Brownhills",
+                "candidate": "Wendy Morton"
+              },
+              {
+                "constituency": "Birmingham Northfield",
+                "candidate": "Gary Sambrook"
+              },
+              {
+                "constituency": "Burton and Uttoxeter",
+                "candidate": "Kate Kniveton"
+              },
+              {
+                "constituency": "Cannock Chase",
+                "candidate": "Amanda Milling"
+              },
+              {
+                "constituency": "Droitwich and Evesham",
+                "candidate": "Nigel Huddleston"
+              },
+              {
+                "constituency": "Dudley",
+                "candidate": "Marco Longhi"
+              },
+              {
+                "constituency": "Halesowen",
+                "candidate": "James Morris"
+              },
+              {
+                "constituency": "Hereford and South Herefordshire",
+                "candidate": "Jesse Norman"
+              },
+              {
+                "constituency": "Kenilworth and Southam",
+                "candidate": "Jeremy Wright"
+              },
+              {
+                "constituency": "Kingswinford and South Staffordshire",
+                "candidate": "Mike Wood"
+              },
+              {
+                "constituency": "Lichfield",
+                "candidate": "Michael Fabricant"
+              },
+              {
+                "constituency": "Meriden and Solihull East",
+                "candidate": "Saqib Bhatti"
+              },
+              {
+                "constituency": "North Herefordshire",
+                "candidate": "Bill Wiggin"
+              },
+              {
+                "constituency": "North Warwickshire and Bedworth",
+                "candidate": "Craig Tracey"
+              },
+              {
+                "constituency": "Nuneaton",
+                "candidate": "Marcus Jones"
+              },
+              {
+                "constituency": "Redditch",
+                "candidate": "Rachel Maclean"
+              },
+              {
+                "constituency": "Shrewsbury",
+                "candidate": "Daniel Kawczynski"
+              },
+              {
+                "constituency": "Stafford",
+                "candidate": "Theo Clarke"
+              },
+              {
+                "constituency": "Staffordshire Moorlands",
+                "candidate": "Karen Bradley"
+              },
+              {
+                "constituency": "Stoke-on-Trent North",
+                "candidate": "Jonathan Gullis"
+              },
+              {
+                "constituency": "Stoke-on-Trent South",
+                "candidate": "Jack Brereton"
+              },
+              {
+                "constituency": "Stourbridge",
+                "candidate": "Suzanne Webb"
+              },
+              {
+                "constituency": "Sutton Coldfield",
+                "candidate": "Andrew Mitchell"
+              },
+              {
+                "constituency": "The Wrekin",
+                "candidate": "Mark Pritchard"
+              },
+              {
+                "constituency": "Tipton and Wednesbury",
+                "candidate": "Shaun Bailey"
+              },
+              {
+                "constituency": "West Worcestershire",
+                "candidate": "Harriett Baldwin"
+              },
+              {
+                "constituency": "Wolverhampton North East",
+                "candidate": "Jane Stevenson"
+              },
+              {
+                "constituency": "Wyre Forest",
+                "candidate": "Mark Garnier"
+              },
+              {
+                "constituency": "Beverley and Holderness",
+                "candidate": "Graham Stuart"
+              },
+              {
+                "constituency": "Goole and Pocklington",
+                "candidate": "David Davis"
+              },
+              {
+                "constituency": "Brigg and Immingham",
+                "candidate": "Martin Vickers"
+              },
+              {
+                "constituency": "Great Grimsby and Cleethorpes",
+                "candidate": "Lia Nici"
+              },
+              {
+                "constituency": "Scunthorpe",
+                "candidate": "Holly Mumby-Croft"
+              },
+              {
+                "constituency": "Harrogate and Knaresborough",
+                "candidate": "Andrew Jones"
+              },
+              {
+                "constituency": "Richmond and Northallerton",
+                "candidate": "Rishi Sunak"
+              },
+              {
+                "constituency": "Skipton and Ripon",
+                "candidate": "Julian Smith"
+              },
+              {
+                "constituency": "Thirsk and Malton",
+                "candidate": "Kevin Hollinrake"
+              },
+              {
+                "constituency": "Wetherby and Easingwold",
+                "candidate": "Alec Shelbrooke"
+              },
+              {
+                "constituency": "York Outer",
+                "candidate": "Julian Sturdy"
+              },
+              {
+                "constituency": "Doncaster East and the Isle of Axholme",
+                "candidate": "Nick Fletcher"
+              },
+              {
+                "constituency": "Penistone and Stocksbridge",
+                "candidate": "Miriam Cates"
+              },
+              {
+                "constituency": "Rother Valley",
+                "candidate": "Alexander Stafford"
+              },
+              {
+                "constituency": "Colne Valley",
+                "candidate": "Jason McCartney"
+              },
+              {
+                "constituency": "Keighley and Ilkley",
+                "candidate": "Robbie Moore"
+              },
+              {
+                "constituency": "Leeds South West and Morley",
+                "candidate": "Andrea Jenkyns"
+              },
+              {
+                "constituency": "Shipley",
+                "candidate": "Philip Davies"
+              }
+            ];
+
+            // Shuffle and select 24 items (25th will be the free square)
+            const shuffled = jsonItems.sort(() => 0.5 - Math.random());
+            const selectedItems = shuffled.slice(0, 24);
+            setItems(selectedItems);
+            saveState(selectedItems, []);
+          }
+        } catch (err) {
+          console.error("Error loading data:", err);
+          setError("Failed to load bingo card data. Please try refreshing the page.");
+        } finally {
+          setIsLoading(false);
+        }
+      }, []);
+
+      const saveState = (items, checkedSquares) => {
+        const state = JSON.stringify({
+          savedItems: items,
+          savedCheckedSquares: Array.from(checkedSquares)
+        });
+        localStorage.setItem('bingoState', state);
+      };
+
+      const toggleSquare = (index) => {
+        setCheckedSquares(prev => {
+          const newSet = new Set(prev);
+          if (newSet.has(index)) {
+            newSet.delete(index);
+          } else {
+            newSet.add(index);
+          }
+          saveState(items, newSet);
+          return newSet;
+        });
+      };
+
+      const resetCard = () => {
+        localStorage.removeItem('bingoState');
+        window.location.reload();
+      };
+
+      const renderSquare = (index) => {
+        if (index === 12) {
+          return (
+            <div key={index} className="bingo-square free-square">
+              TORIES LOSE!
+            </div>
+          );
+        }
+
+        const itemIndex = index > 12 ? index - 1 : index;
+        const isChecked = checkedSquares.has(index);
+
+        // Add a safeguard check
+        if (!items[itemIndex]) {
+          return <div key={index} className="bingo-square">Loading...</div>;
+        }
+
+        return (
+          <div
+            key={index}
+            className={`bingo-square ${isChecked ? 'checked' : ''}`}
+            onClick={() => toggleSquare(index)}
+          >
+            <div className="candidate-name">{items[itemIndex].candidate}</div>
+            <div className="constituency">{items[itemIndex].constituency}</div>
+          </div>
+        );
+      };
+
+      if (isLoading) {
+        return <div className="loading">Loading bingo card...</div>;
+      }
+
+      if (error) {
+        return <div className="error">{error}</div>;
+      }
+
+      return (
+        <div>
+          <div className="bingo-card">
+            {[...Array(25)].map((_, index) => renderSquare(index))}
+          </div>
+          <button className="reset-button" onClick={resetCard}>Reset Card</button>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<BingoCard />, document.getElementById('root'));
+  </script>
+</body>
+
+</html>
