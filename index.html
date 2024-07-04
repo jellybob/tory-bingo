@@ -1013,8 +1013,11 @@
       };
 
       const resetCard = () => {
-        localStorage.removeItem('bingoState');
-        window.location.reload();
+        let hasCheckedAnything = checkedSquares.size > 0;
+        if (!hasCheckedAnything || window.confirm("Are you sure? There's no way of getting the old one back!")) {
+          localStorage.removeItem('bingoState');
+          window.location.reload();
+        }
       };
 
       const elideText = (text, maxLength) => {
