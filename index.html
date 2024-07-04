@@ -12,26 +12,31 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 10px;
       background-color: #f0f0f0;
+      box-sizing: border-box;
     }
-
+    
     .bingo-card {
+      aspect-ratio: 1 / 1;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
       background-color: #fff;
-      padding: 20px;
+      padding: 10px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-height: 100%;
+      box-sizing: border-box;
     }
-
+    
     .bingo-square {
-      width: 120px;
-      height: 120px;
+      aspect-ratio: 1 / 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -44,28 +49,30 @@
       cursor: pointer;
       transition: background-color 0.3s;
       padding: 5px;
+      box-sizing: border-box;
     }
-
+    
     .bingo-square.checked {
       background-color: #4CAF50;
       color: white;
     }
-
+    
     .candidate-name {
       font-weight: bold;
       margin-bottom: 5px;
+      font-size: 1.8vw;
     }
-
+    
     .constituency {
-      font-size: 10px;
+      font-size: 1.4vw;
     }
-
+    
     .free-square {
       background-color: #FFC107;
-      font-size: 16px;
+      font-size: 2.5vw;
       font-weight: bold;
     }
-
+    
     .reset-button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -76,18 +83,55 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
+    
     .loading {
       font-size: 18px;
       text-align: center;
       margin: 20px;
     }
-
+    
     .error {
       color: red;
       font-size: 18px;
       text-align: center;
       margin: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .bingo-card {
+        gap: 5px;
+        padding: 5px;
+      }
+    
+      .bingo-square {
+        padding: 2px;
+      }
+    
+      .candidate-name {
+        font-size: 2.5vw;
+      }
+    
+      .constituency {
+        font-size: 2vw;
+      }
+    
+      .free-square {
+        font-size: 3.5vw;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .candidate-name {
+        font-size: 3vw;
+      }
+    
+      .constituency {
+        font-size: 2vw;
+      }
+    
+      .free-square {
+        font-size: 4vw;
+      }
     }
   </style>
 </head>
